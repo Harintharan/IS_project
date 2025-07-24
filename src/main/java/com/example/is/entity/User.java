@@ -1,0 +1,93 @@
+//package com.example.is.entity;
+//
+//
+//import jakarta.persistence.*;
+//
+//@Entity
+//@Table(name = "users") // Avoid using "user" (reserved in some DBs)
+//public class User {
+//
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
+//
+//    @Column(nullable = false, unique = true)
+//    private String username;
+//
+//    @Column(nullable = false, unique = true)
+//    private String email;
+//
+//    @Column(nullable = false)
+//    private String password;
+//
+//    private String role = "USER"; // Default role
+//
+//    // Getters and setters (can use Lombok to reduce boilerplate)
+//    public Long getId() { return id; }
+//    public void setId(Long id) { this.id = id; }
+//
+//    public String getUsername() { return username; }
+//    public void setUsername(String username) { this.username = username; }
+//
+//    public String getEmail() { return email; }
+//    public void setEmail(String email) { this.email = email; }
+//
+//    public String getPassword() { return password; }
+//    public void setPassword(String password) { this.password = password; }
+//
+//    public String getRole() { return role; }
+//    public void setRole(String role) { this.role = role; }
+//}
+
+
+
+package com.example.is.entity;
+
+import jakarta.persistence.*;
+
+import java.security.PublicKey;
+
+@Entity
+@Table(name = "users") // Avoid using "user" (reserved in some DBs)
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    private String role = "USER"; // Default role
+
+//    @Column(columnDefinition = "TEXT")
+//    private String publicKey; // 👈 Add this line to store public key as Base64 string
+
+    @Transient
+    private PublicKey publicKey; // Don't persist, runtime only
+
+
+    // Getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
+
+}

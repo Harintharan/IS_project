@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Secure Chat</title>
+</head>
+<body>
+<h2>Welcome, <span th:text="${currentUser}"></span></h2>
+
+<h3>Online Users:</h3>
+<ul>
+    <li th:each="user : ${onlineUsers}" th:if="${user} != ${currentUser}">
+        <a href="#" th:attr="data-user=${user}" onclick="selectUser(this)"><span th:text="${user}"></span></a>
+    </li>
+</ul>
+
+<hr>
+
+<h3>Chat with: <span id="chattingWith">None</span></h3>
+<div id="chatBox" style="border: 1px solid black; height: 200px; overflow-y: scroll;"></div>
+
+<form id="chatForm">
+    <input type="text" id="message" placeholder="Enter message" required>
+    <button type="submit">Send</button>
+</form>
+
+<!--<script>-->
+<!--    let selectedUser = null;-->
+<!--    const username = /*[[${currentUser}]]*/ "";-->
+
+<!--    function selectUser(el) {-->
+<!--        selectedUser = el.getAttribute("data-user");-->
+<!--        document.getElementById("chattingWith").innerText = selectedUser;-->
+<!--        loadChat();-->
+<!--    }-->
+
+<!--    document.getElementById("chatForm").addEventListener("submit", function (e) {-->
+<!--        e.preventDefault();-->
+<!--        const msg = document.getElementById("message").value;-->
+
+<!--        fetch('/chat/send', {-->
+<!--            method: 'POST',-->
+<!--            headers: { 'Content-Type': 'application/json' },-->
+<!--            body: JSON.stringify({ sender: username, receiver: selectedUser, message: msg })-->
+<!--        }).then(() => {-->
+<!--            document.getElementById("message").value = "";-->
+<!--            loadChat();-->
+<!--        });-->
+<!--    });-->
+
+<!--    function loadChat() {-->
+<!--        if (!selectedUser) return;-->
+<!--        fetch(`/chat/history?user1=${username}&user2=${selectedUser}`)-->
+<!--            .then(res => res.json())-->
+<!--            .then(messages => {-->
+<!--                const chatBox = document.getElementById("chatBox");-->
+<!--                chatBox.innerHTML = "";-->
+<!--                messages.forEach(msg => {-->
+<!--                    const p = document.createElement("p");-->
+<!--                    p.innerText = msg;-->
+<!--                    chatBox.appendChild(p);-->
+<!--                });-->
+<!--            });-->
+<!--    }-->
+
+<!--    setInterval(loadChat, 3000);-->
+<!--</script>-->
+
+<script th:inline="javascript">
+    let selectedUser = null;
+    const username = [[${#strings.escapeJavaScript(currentUser)}]];
+
+    function selectUser(el) {
+        selectedUser = el.getAttribute("data-user");
+        document.getElementById("chattingWith").innerText = selectedUser;
+        loadChat();
+    }
+
+    document.getElementById("chatForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const msg = document.getElementById("message").value;
+
+        fetch('/chat/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sender: username, receiver: selectedUser, message: msg })
+        }).then(() => {
+            document.getElementById("message").value = "";
+            loadChat();
+        });
+    });
+
+    function loadChat() {
+        if (!selectedUser) return;
+        fetch(`/chat/history?user1=${username}&user2=${selectedUser}`)
+            .then(res => res.json())
+            .then(messages => {
+                const chatBox = document.getElementById("chatBox");
+                chatBox.innerHTML = "";
+                messages.forEach(msg => {
+                    const p = document.createElement("p");
+                    p.innerText = msg;
+                    chatBox.appendChild(p);
+                });
+            });
+    }
+
+    setInterval(loadChat, 3000);
+</script>
+
+
+
+</body>
+</html>

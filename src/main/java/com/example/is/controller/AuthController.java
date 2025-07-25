@@ -1,44 +1,4 @@
-//package com.example.is.controller;
-//
-//import com.example.is.entity.User;
-//import com.example.is.service.UserService;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.*;
-//
-//@RestController
-//@RequestMapping("/auth")
-//@CrossOrigin(origins = "*") // Allow requests from frontend (e.g., React or UI)
-//public class AuthController {
-//
-//    private final UserService userService;
-//
-//    @Autowired
-//    public AuthController(UserService userService) {
-//        this.userService = userService;
-//    }
-//
-//    @PostMapping("/signup")
-//    public ResponseEntity<String> registerUser(@RequestBody User user) {
-//        boolean success = userService.registerUser(user);
-//        if (success) {
-//            return ResponseEntity.ok("User registered successfully");
-//        } else {
-//            return ResponseEntity.badRequest().body("Username or Email already exists");
-//        }
-//    }
-//
-//    // Login endpoint (placeholder; real authentication will be done via Spring Security)
-//    @PostMapping("/login")
-//    public ResponseEntity<String> loginUser(@RequestBody User loginRequest) {
-//        User existingUser = userService.getUserByUsername(loginRequest.getUsername());
-//        if (existingUser != null) {
-//            return ResponseEntity.ok("Login successful (auth logic via Spring Security)");
-//        } else {
-//            return ResponseEntity.status(401).body("Invalid credentials");
-//        }
-//    }
-//}
+
 
 package com.example.is.controller;
 
@@ -82,7 +42,7 @@ public class AuthController {
     @GetMapping("/signup")
     public String showSignupForm(Model model) {
         model.addAttribute("user", new User());
-        return "signup"; // Thymeleaf template name: signup.html
+        return "signup";
     }
 
     @PostMapping("/signup")
@@ -98,10 +58,10 @@ public class AuthController {
 
     @GetMapping("/login")
     public String showLoginForm() {
-        return "login"; // Thymeleaf template name: login.html
+        return "login";
     }
 
-    // (Optional) Manual login — Spring Security handles this if using formLogin()
+
     @PostMapping("/login")
     public String processLogin(@RequestParam String username,
                                @RequestParam String password,
@@ -114,7 +74,7 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(username, password)
             );
 
-            // Authenticated successfully
+
             activeUserService.login(username); // 👈 Add this line
             return "redirect:/chat"; // Or your desired page
         } catch (Exception e) {

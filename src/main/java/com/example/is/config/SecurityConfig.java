@@ -20,21 +20,7 @@ public class SecurityConfig {
 
 
 
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(csrf -> csrf.disable())
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/auth/**").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .formLogin(form -> form
-//                        .loginPage("/login").permitAll()
-//                )
-//                .logout(logout -> logout.permitAll());
-//
-//        return http.build();
-//    }
+
 
     private final ActiveUserService activeUserService;
 

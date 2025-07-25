@@ -18,14 +18,14 @@ public class AuditLogController {
         this.auditLogRepository = auditLogRepository;
     }
 
-    // 🔹 Get all audit logs
+
     @GetMapping
     public List<AuditLog> getAllLogs() {
         System.out.println("..............");
         return auditLogRepository.findAll();
     }
 
-    // 🔹 Filter logs by username (optional)
+
     @GetMapping("/user/{username}")
     public List<AuditLog> getLogsByUser(@PathVariable String username) {
         return auditLogRepository.findByUsername(username);

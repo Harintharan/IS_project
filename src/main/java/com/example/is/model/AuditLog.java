@@ -14,7 +14,7 @@ public class AuditLog {
     private Long id;
 
     private String username;
-    private String action; // LOGIN or LOGOUT
+    private String action;
     private long timestamp;
 }
 

@@ -23,12 +23,7 @@ public class ChatPageController {
         this.activeUserService = activeUserService;
     }
 
-//    @GetMapping("/chat")
-//    public String chatPage(@AuthenticationPrincipal UserDetails user, Model model) {
-//        model.addAttribute("username", user.getUsername());
-//        model.addAttribute("onlineUsers", activeUserService.getActiveUsers());
-//        return "chat";
-//    }
+
 
     @GetMapping
     public String showChatPage(Model model, Principal principal) {

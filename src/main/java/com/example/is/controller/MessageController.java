@@ -1,8 +1,7 @@
 package com.example.is.controller;
 
 import com.example.is.service.MessageService;
-import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +21,7 @@ public class MessageController {
     public MessageController(MessageService messageService) {
         this.messageService = messageService;
     }
-    // Endpoint to send a message
+
     @PostMapping("/send")
     public ResponseEntity<?> sendMessage(@RequestBody Map<String, String> payload) {
         try {
@@ -37,29 +36,7 @@ public class MessageController {
         }
     }
 
-    // Endpoint to retrieve chat history between two users
-//    @GetMapping("/history")
-//    public ResponseEntity<?> getChat(@RequestParam String user1, @RequestParam String user2) {
-//        try {
-//            List<String> chat = messageService.getChat(user1, user2);
-//            return ResponseEntity.ok(chat);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body("Error fetching chat: " + e.getMessage());
-//        }
-//    }
 
-//    @GetMapping("/history")
-//    public ResponseEntity<?> getChat(
-//            @RequestParam String user1,
-//            @RequestParam String user2,
-//            @RequestParam String viewer) {
-//        try {
-//            List<String> chat = messageService.getChat(user1, user2, viewer);
-//            return ResponseEntity.ok(chat);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body("Error fetching chat: " + e.getMessage());
-//        }
-//    }
 
     @GetMapping("/history")
     public ResponseEntity<?> getChat(
@@ -68,7 +45,7 @@ public class MessageController {
             @RequestParam(required = false) String viewer) {
         try {
             if (viewer == null) {
-               // System.out.println("⚠️ Viewer not provided. Using user1 (" + user1 + ") as viewer.");
+
                 viewer = user1; // fallback to default
             }
 

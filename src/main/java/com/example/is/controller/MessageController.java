@@ -38,13 +38,45 @@ public class MessageController {
     }
 
     // Endpoint to retrieve chat history between two users
+//    @GetMapping("/history")
+//    public ResponseEntity<?> getChat(@RequestParam String user1, @RequestParam String user2) {
+//        try {
+//            List<String> chat = messageService.getChat(user1, user2);
+//            return ResponseEntity.ok(chat);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body("Error fetching chat: " + e.getMessage());
+//        }
+//    }
+
+//    @GetMapping("/history")
+//    public ResponseEntity<?> getChat(
+//            @RequestParam String user1,
+//            @RequestParam String user2,
+//            @RequestParam String viewer) {
+//        try {
+//            List<String> chat = messageService.getChat(user1, user2, viewer);
+//            return ResponseEntity.ok(chat);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body("Error fetching chat: " + e.getMessage());
+//        }
+//    }
+
     @GetMapping("/history")
-    public ResponseEntity<?> getChat(@RequestParam String user1, @RequestParam String user2) {
+    public ResponseEntity<?> getChat(
+            @RequestParam String user1,
+            @RequestParam String user2,
+            @RequestParam(required = false) String viewer) {
         try {
-            List<String> chat = messageService.getChat(user1, user2);
+            if (viewer == null) {
+                viewer = user1; // fallback to default
+            }
+
+            List<String> chat = messageService.getChat(user1, user2, viewer);
             return ResponseEntity.ok(chat);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error fetching chat: " + e.getMessage());
         }
     }
+
+
 }

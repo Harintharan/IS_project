@@ -49,7 +49,9 @@ import org.springframework.stereotype.Service;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -131,7 +133,110 @@ public class MessageService {
 //                }).collect(Collectors.toList());
 //    }
 
-    public List<String> getChat(String user1, String user2) {
+//    public List<String> getChat(String user1, String user2) {
+//        return messageList.stream()
+//                .filter(m ->
+//                        (m.getSender().equals(user1) && m.getReceiver().equals(user2)) ||
+//                                (m.getSender().equals(user2) && m.getReceiver().equals(user1))
+//                )
+//                .map(m -> {
+//                    try {
+//                        String encrypted = m.getEncryptedMessage();
+//                        String hmac = m.getHmac();
+//                        String sender = m.getSender();
+//                        String receiver = m.getReceiver();
+//
+//                        System.out.println("\n🔄 Processing message:");
+//                        System.out.println("👤 Sender: " + sender);
+//                        System.out.println("🎯 Receiver: " + receiver);
+//                        System.out.println("🔐 Encrypted: " + encrypted);
+//                        System.out.println("🔑 HMAC: " + hmac);
+//
+//                        // ✅ Step 1: Verify HMAC
+//                        boolean hmacValid = SecureMessageUtils.verifyHMAC(encrypted, hmac);
+//                        System.out.println("✅ HMAC Valid: " + hmacValid);
+//                        if (!hmacValid) {
+//                            return sender + ": ❌ [Tampered message]";
+//                        }
+//
+//                        // ✅ Step 2: Determine if user1 is receiver (i.e., should decrypt)
+//                        if (receiver.equals(user1)) {
+//                            PrivateKey receiverPrivateKey = activeUserService.getPrivateKey(user1);
+//                            if (receiverPrivateKey == null) {
+//                                System.out.println("❌ Missing private key for user: " + user1);
+//                                return sender + ": ❌ [Missing Key]";
+//                            }
+//
+//                            // ✅ Step 3: Decrypt
+//                            String decrypted = SecureMessageUtils.decryptMessage(encrypted, receiverPrivateKey);
+//                            System.out.println("✅ Decrypted message: " + decrypted);
+//                            return sender + ": " + decrypted;
+//                        } else {
+//                            // Sender side — don’t decrypt
+//                            System.out.println("ℹ️ Not decrypting (viewer is sender), showing encrypted");
+//                            return sender + ": 🔐 [Encrypted]";
+//                        }
+//
+//                    } catch (Exception e) {
+//                        System.out.println("❌ Error decrypting: " + e.getMessage());
+//                        e.printStackTrace();
+//                        return m.getSender() + ": ⚠️ [Error Decrypting]";
+//                    }
+//                })
+//                .collect(Collectors.toList());
+//    }
+
+//    public List<String> getChat(String user1, String user2, String viewer) {
+//        return messageList.stream()
+//                .filter(m ->
+//                        (m.getSender().equals(user1) && m.getReceiver().equals(user2)) ||
+//                                (m.getSender().equals(user2) && m.getReceiver().equals(user1))
+//                )
+//                .map(m -> {
+//                    try {
+//                        String encrypted = m.getEncryptedMessage();
+//                        String hmac = m.getHmac();
+//                        String sender = m.getSender();
+//                        String receiver = m.getReceiver();
+//
+//                        // Only log once per message: when viewed by the receiver
+//                        if (!viewer.equals(receiver)) {
+//                            return sender + ": 🔐 [Encrypted]";
+//                        }
+//
+//                        System.out.println("\n🔄 Processing message:");
+//                        System.out.println("👤 Sender: " + sender);
+//                        System.out.println("🎯 Receiver: " + receiver);
+//                        System.out.println("🔐 Encrypted: " + encrypted);
+//                        System.out.println("🔑 HMAC: " + hmac);
+//
+//                        boolean hmacValid = SecureMessageUtils.verifyHMAC(encrypted, hmac);
+//                        System.out.println("✅ HMAC Valid: " + hmacValid);
+//                        if (!hmacValid) {
+//                            return sender + ": ❌ [Tampered message]";
+//                        }
+//
+//                        PrivateKey receiverPrivateKey = activeUserService.getPrivateKey(receiver);
+//                        if (receiverPrivateKey == null) {
+//                            System.out.println("❌ Missing private key for user: " + receiver);
+//                            return sender + ": ❌ [Missing Key]";
+//                        }
+//
+//                        String decrypted = SecureMessageUtils.decryptMessage(encrypted, receiverPrivateKey);
+//                        System.out.println("✅ Decrypted message: " + decrypted);
+//                        return sender + ": " + decrypted;
+//
+//                    } catch (Exception e) {
+//                        System.out.println("❌ Error decrypting: " + e.getMessage());
+//                        return m.getSender() + ": ⚠️ [Error Decrypting]";
+//                    }
+//                })
+//                .collect(Collectors.toList());
+//    }
+
+    private final Set<String> processedMessageHashes = new HashSet<>();
+
+    public List<String> getChat(String user1, String user2, String viewer) {
         return messageList.stream()
                 .filter(m ->
                         (m.getSender().equals(user1) && m.getReceiver().equals(user2)) ||
@@ -139,50 +244,58 @@ public class MessageService {
                 )
                 .map(m -> {
                     try {
-                        String encrypted = m.getEncryptedMessage();
-                        String hmac = m.getHmac();
                         String sender = m.getSender();
                         String receiver = m.getReceiver();
+                        String encrypted = m.getEncryptedMessage();
+                        String hmac = m.getHmac();
 
-                        System.out.println("\n🔄 Processing message:");
-                        System.out.println("👤 Sender: " + sender);
-                        System.out.println("🎯 Receiver: " + receiver);
-                        System.out.println("🔐 Encrypted: " + encrypted);
-                        System.out.println("🔑 HMAC: " + hmac);
+                        // Unique identifier for the message
+                        String signature = sender + "|" + receiver + "|" + hmac;
 
-                        // ✅ Step 1: Verify HMAC
-                        boolean hmacValid = SecureMessageUtils.verifyHMAC(encrypted, hmac);
-                        System.out.println("✅ HMAC Valid: " + hmacValid);
-                        if (!hmacValid) {
-                            return sender + ": ❌ [Tampered message]";
-                        }
+                        if (!processedMessageHashes.contains(signature)) {
+                            processedMessageHashes.add(signature); // mark as processed
 
-                        // ✅ Step 2: Determine if user1 is receiver (i.e., should decrypt)
-                        if (receiver.equals(user1)) {
-                            PrivateKey receiverPrivateKey = activeUserService.getPrivateKey(user1);
-                            if (receiverPrivateKey == null) {
-                                System.out.println("❌ Missing private key for user: " + user1);
-                                return sender + ": ❌ [Missing Key]";
+                            System.out.println("\n🔄 Processing message:");
+                            System.out.println("👤 Sender: " + sender);
+                            System.out.println("🎯 Receiver: " + receiver);
+                            System.out.println("🔐 Encrypted: " + encrypted);
+                            System.out.println("🔑 HMAC: " + hmac);
+
+                            boolean hmacValid = SecureMessageUtils.verifyHMAC(encrypted, hmac);
+                            System.out.println("✅ HMAC Valid: " + hmacValid);
+
+                            if (!hmacValid) {
+                                return sender + ": ❌ [Tampered message]";
                             }
 
-                            // ✅ Step 3: Decrypt
-                            String decrypted = SecureMessageUtils.decryptMessage(encrypted, receiverPrivateKey);
-                            System.out.println("✅ Decrypted message: " + decrypted);
-                            return sender + ": " + decrypted;
+                            if (viewer.equals(receiver)) {
+                                PrivateKey receiverPrivateKey = activeUserService.getPrivateKey(receiver);
+                                String decrypted = SecureMessageUtils.decryptMessage(encrypted, receiverPrivateKey);
+                                System.out.println("✅ Decrypted message: " + decrypted);
+                                return sender + ": " + decrypted;
+                            } else {
+                                System.out.println("ℹ️ Viewer is not receiver, showing encrypted");
+                                return sender + ": 🔐 [Encrypted]";
+                            }
                         } else {
-                            // Sender side — don’t decrypt
-                            System.out.println("ℹ️ Not decrypting (viewer is sender), showing encrypted");
-                            return sender + ": 🔐 [Encrypted]";
+                            // Already processed — just return without logging
+                            if (viewer.equals(receiver)) {
+                                PrivateKey receiverPrivateKey = activeUserService.getPrivateKey(receiver);
+                                String decrypted = SecureMessageUtils.decryptMessage(encrypted, receiverPrivateKey);
+                                return sender + ": " + decrypted;
+                            } else {
+                                return sender + ": 🔐 [Encrypted]";
+                            }
                         }
-
                     } catch (Exception e) {
-                        System.out.println("❌ Error decrypting: " + e.getMessage());
-                        e.printStackTrace();
+                        System.out.println("❌ Error processing message: " + e.getMessage());
                         return m.getSender() + ": ⚠️ [Error Decrypting]";
                     }
                 })
                 .collect(Collectors.toList());
     }
+
+
 
 
 }

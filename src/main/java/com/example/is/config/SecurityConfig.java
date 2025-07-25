@@ -51,7 +51,8 @@ public class SecurityConfig {
                                 "/auth/**",    // REST signup/login APIs
                                 "/login",      // custom login page
                                 "/signup",     // signup page (if you have one)
-                                "/css/**", "/js/**", "/images/**" // static resources
+                                "/css/**", "/js/**", "/images/**", // static resources
+                                "/api/auditlogs/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

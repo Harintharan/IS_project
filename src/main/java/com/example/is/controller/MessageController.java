@@ -68,6 +68,7 @@ public class MessageController {
             @RequestParam(required = false) String viewer) {
         try {
             if (viewer == null) {
+               // System.out.println("⚠️ Viewer not provided. Using user1 (" + user1 + ") as viewer.");
                 viewer = user1; // fallback to default
             }
 
@@ -77,6 +78,9 @@ public class MessageController {
             return ResponseEntity.status(500).body("Error fetching chat: " + e.getMessage());
         }
     }
+
+
+    
 
 
 }

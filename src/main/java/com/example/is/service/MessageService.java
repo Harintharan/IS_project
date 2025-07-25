@@ -43,7 +43,10 @@
 package com.example.is.service;
 
 import com.example.is.crypto.SecureMessageUtils;
+import com.example.is.model.AuditLog;
 import com.example.is.model.ChatMessage;
+import com.example.is.repository.AuditLogRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
@@ -56,6 +59,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class MessageService {
+    @Autowired
+    private AuditLogRepository auditLogRepository;
+
 
     private final List<ChatMessage> messageList = new ArrayList<>();
     private final ActiveUserService activeUserService;
@@ -269,9 +275,19 @@ public class MessageService {
                             }
 
                             if (viewer.equals(receiver)) {
+//                                PrivateKey receiverPrivateKey = activeUserService.getPrivateKey(receiver);
+//                                String decrypted = SecureMessageUtils.decryptMessage(encrypted, receiverPrivateKey);
+//                                System.out.println("✅ Decrypted message: " + decrypted);
+//                                return sender + ": " + decrypted;
+
                                 PrivateKey receiverPrivateKey = activeUserService.getPrivateKey(receiver);
                                 String decrypted = SecureMessageUtils.decryptMessage(encrypted, receiverPrivateKey);
                                 System.out.println("✅ Decrypted message: " + decrypted);
+
+
+
+
+
                                 return sender + ": " + decrypted;
                             } else {
                                 System.out.println("ℹ️ Viewer is not receiver, showing encrypted");

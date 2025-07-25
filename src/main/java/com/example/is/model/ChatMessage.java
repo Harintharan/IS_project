@@ -11,5 +11,7 @@ public class ChatMessage {
     private String encryptedMessage;
     private long timestamp;
     private String hmac;
+
+    private String plainTextForSender;
 }
 
